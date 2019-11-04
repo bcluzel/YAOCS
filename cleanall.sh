@@ -1,5 +1,5 @@
 
 cd client
-make 
+make remove
 cd ../server
-make
+make remove
