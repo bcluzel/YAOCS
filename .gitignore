@@ -1,3 +1,5 @@
 *.o
-bin/*
-~bin/.gitkeep
+server/bin/*
+client/bin/*
+~.gitkeep
+.vscode
