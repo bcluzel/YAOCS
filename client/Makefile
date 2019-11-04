@@ -3,13 +3,14 @@ TARGET 		= client
 CC 		= gcc
 LINKER 	= gcc -o
 
-CFLAGS 		= -Wall 
-LFLAGS 		= -Wall -I. 
 
 SRCDIR 		= src
 OBJDIR 		= out
 BINDIR 		= bin
 LIBDIR		= ../libs
+
+CFLAGS 		= -Wall -I$(LIBDIR)
+LFLAGS 		= -Wall -I. 
 
 SOURCES 	:= $(wildcard $(SRCDIR)/*.c) 
 SOURCES_LIB := $(wildcard $(LIBDIR)/*.c)
