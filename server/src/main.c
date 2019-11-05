@@ -11,7 +11,6 @@
 #include "utils.h"
 
 
-
 int main(int argc, char *argv[])
 {
     printf("Server launched ! \n");
@@ -33,8 +32,11 @@ int main(int argc, char *argv[])
     while (runing)
     {
 
-        read_header(fd);
-        sleep(1);
+        struct message message = read_header(fd);
+        printf("%d %d \n",message.user_id,message.data_len);
+        message.data = malloc(sizeof(char)*message.data_len);
+        
+        free(message.data);
     }
     
 
@@ -43,7 +45,7 @@ int main(int argc, char *argv[])
 }
 
 
-void read_header(int fd){
+struct message read_header(int fd){
 
     static char buffer [NUMBER_OF_BYTES_IN_HEADER];
     static int head=0;
@@ -52,15 +54,15 @@ void read_header(int fd){
         int answer = read(fd,&buffer[head],1);
         exit_if(answer == -1, "read read_client");
         head += answer;
-        printf("%c",buffer[head]);
     }
     head = 0;
-    for (int i = 0; i < NUMBER_OF_BYTES_IN_HEADER; i++)
-    {
-        printf("%c",buffer[i]);
-    }
-    
+    struct message answer;
+    answer.user_id = four_char_to_int(&buffer[0]);
+    answer.data_len = four_char_to_int(&buffer[4]);
+    return answer;
 }
+
+
 // void read_client(int fd){
 //     struct message recived_message;
 //     int answer = read(fd,&recived_message.user_id,sizeof(recived_message.user_id));
