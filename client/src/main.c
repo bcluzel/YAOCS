@@ -31,11 +31,14 @@ int main(int argc, char *argv[])
 }
 
 void send_message_server(int server_fd, char *message, int message_len){
-
     exit_if(write(server_fd,message,message_len),"send serv message write");
 
 }
 
 void hello(int server_fd){
-    exit_if(write(server_fd,"01234567",8) == -1,"hello write");
+    char buffer[8];
+    int_to_four_char(id_client,buffer);
+    int_to_four_char(0,&buffer[4]); // message len de 0
+    exit_if(write(server_fd,buffer,8) == -1,"hello write");
+    printf("%d \n",id_client);
 }

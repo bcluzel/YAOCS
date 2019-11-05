@@ -1,1 +1,2 @@
-void read_header(int fd);
+
+struct message read_header(int fd);
