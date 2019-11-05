@@ -26,7 +26,7 @@ int main(int argc, char *argv[])
         }
     }
     
-    int fd = open(SERV_PIPE_NAME,O_RDONLY | O_CREAT);
+    int fd = open(SERV_PIPE_NAME, O_RDONLY | O_CREAT);
     exit_if(fd == -1, "fopen SERV_PIPE_NAME");
 
     while (runing)
@@ -35,7 +35,8 @@ int main(int argc, char *argv[])
         struct message message = read_header(fd);
         printf("%d %d \n",message.user_id,message.data_len);
         message.data = malloc(sizeof(char)*message.data_len);
-        
+        recive_message(fd,message.data,message.data_len);
+        printf("%s",message.data);
         free(message.data);
     }
     
@@ -51,9 +52,15 @@ struct message read_header(int fd){
     static int head=0;
     while (head<NUMBER_OF_BYTES_IN_HEADER)
     {
-        int answer = read(fd,&buffer[head],1);
-        exit_if(answer == -1, "read read_client");
-        head += answer;
+        int answer_read = read(fd,&buffer[head],1);
+        exit_if(answer_read == -1, "read read_client");
+        head += answer_read;
+        /*
+        if (answer_read == 0)
+        {
+            sleep(1);
+        }
+        */
     }
     head = 0;
     struct message answer;
@@ -63,21 +70,15 @@ struct message read_header(int fd){
 }
 
 
-// void read_client(int fd){
-//     struct message recived_message;
-//     int answer = read(fd,&recived_message.user_id,sizeof(recived_message.user_id));
-//     printf("%d\n", answer);
-//     if (answer != sizeof(recived_message.user_id))
-//     {
-//         return;
-//     }  
-//     exit_if(answer == -1, "read read_client");
-//     answer = read(fd,&recived_message.data_len,sizeof(recived_message.data_len));
-//     if (answer != sizeof(recived_message.data_len))
-//     {
-//         return;
-//     }
-//     exit_if(answer == -1, "read read_client");
-//     printf("%d",recived_message.data_len);
+void recive_message(int fd, char * data, int data_len){
+    int head=0;
+    while (head<data_len)
+    {
+    int answer_read = read(fd,&data[head],1);
+    exit_if(answer_read == -1, "read read_client");
+    head += answer_read;
+    }
+    head = 0;
+}
 
-// }
+
