@@ -38,7 +38,7 @@ void send_message_server(int server_fd, char *message){
     char buffer[8];
     create_header(buffer, strlen(message)+1);
     exit_if(write(server_fd,buffer,8) == -1,"hello message write");
-    exit_if(write(server_fd,message,strlen(message)+1),"send serv message write");
+    exit_if(write(server_fd,message,strlen(message)+1) == -1,"send serv message write");
 }
 
 void hello(int server_fd){
