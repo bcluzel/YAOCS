@@ -1,4 +1,3 @@
-
 #include "utils.h"
 struct user_bank {
     int num_of_users;

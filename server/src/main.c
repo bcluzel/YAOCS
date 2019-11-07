@@ -56,41 +56,6 @@ int main(int argc, char *argv[])
 }
 
 
-struct message read_header(int fd){
-
-    static char buffer [NUMBER_OF_BYTES_IN_HEADER];
-    static int head=0;
-    while (head<NUMBER_OF_BYTES_IN_HEADER)
-    {
-        int answer_read = read(fd,&buffer[head],1);
-        exit_if(answer_read == -1, "read read_client");
-        head += answer_read;
-        /*
-        if (answer_read == 0)
-        {
-            sleep(1);
-        }
-        */
-    }
-    head = 0;
-    struct message answer;
-    answer.user_id = four_char_to_int(&buffer[0]);
-    answer.data_len = four_char_to_int(&buffer[4]);
-    return answer;
-}
-
-
-void recive_message(int fd, char * data, int data_len){
-    int head=0;
-    while (head<data_len)
-    {
-    int answer_read = read(fd,&data[head],1);
-    exit_if(answer_read == -1, "read read_client");
-    head += answer_read;
-    }
-    head = 0;
-}
-
 void process_hello(struct user_bank connected_users, unsigned int user_id){
     if (!search_user(connected_users,user_id))
     {
