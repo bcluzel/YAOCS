@@ -14,8 +14,8 @@ int id_client = 0;
 
 int main(int argc, char *argv[])
 {
-    printf("Client launched ! \n");
-
+    printf("YAOCS launched ! \n");
+    int running = 1;
     int fd = open(SERV_PIPE_NAME,O_WRONLY);
     if (fd == -1){
         perror("Pas de serv ");
@@ -23,7 +23,13 @@ int main(int argc, char *argv[])
         //exec delay retry
     }
     hello(fd);
+    while (running)
+    {
+        /* code */
+    }
+    
     send_message_server(fd,"BABA \n");
+
     close(fd);
     return EXIT_SUCCESS;
 }
