@@ -47,7 +47,7 @@ void hello(int server_fd){
     exit_if(write(server_fd,buffer,8) == -1,"hello write");
 }
 
-void create_header(char *buffer, int message_len){
+void create_header(char *buffer, unsigned int message_len){
     int_to_four_char(id_client,buffer);
     int_to_four_char(message_len,&buffer[4]); // message len de 0
 }

@@ -14,6 +14,9 @@
 int main(int argc, char *argv[])
 {
     printf("Server launched ! \n");
+    struct user_bank connected_users;
+    connected_users.num_of_users = 0;
+    connected_users.users = NULL;
 
     int runing = 1;
 
@@ -31,13 +34,20 @@ int main(int argc, char *argv[])
 
     while (runing)
     {
-
         struct message message = read_header(fd);
-        printf("%d %d \n",message.user_id,message.data_len);
-        message.data = malloc(sizeof(char)*message.data_len);
-        recive_message(fd,message.data,message.data_len);
-        printf("%s",message.data);
-        free(message.data);
+        printf("%u %u \n",message.user_id,message.data_len);
+        if (!message.data_len)
+        {
+            // Hello process 
+            process_hello(connected_users,message.user_id);
+
+        }else{
+            message.data = malloc(sizeof(char)*message.data_len);
+            recive_message(fd,message.data,message.data_len);
+            printf("%s",message.data);
+            free(message.data);
+        }
+        
     }
     
 
@@ -81,4 +91,44 @@ void recive_message(int fd, char * data, int data_len){
     head = 0;
 }
 
+void process_hello(struct user_bank connected_users, unsigned int user_id){
+    if (!search_user(connected_users,user_id))
+    {
+        add_user(connected_users,user_id);
+    }else{
+        // user already exist
+    }
+    
+}
 
+unsigned int search_user(struct user_bank connected_users, unsigned int user_id){
+    for (int i = 0; i < connected_users.num_of_users; i++)
+    {
+        if (user_id == connected_users.users[i].id)
+        {
+            return i;
+        }
+        
+    }
+    return 0;
+}
+
+int add_user(struct user_bank connected_users, unsigned int user_id){
+    struct user *next_users = malloc (sizeof(struct user) * (connected_users.num_of_users+1));
+    for (int i = 0; i < connected_users.num_of_users; i++)
+    {
+        next_users[i] = connected_users.users[i];
+    }
+    free(connected_users.users);
+    connected_users.num_of_users ++;
+    connected_users.users = next_users;
+    return 0;
+}
+
+int delete_user(struct user_bank connected_users, unsigned int user_id){
+    return 0;
+}
+
+int change_user_name(struct user_bank connected_users, unsigned int user_id, char * username){
+    return 0;
+}
