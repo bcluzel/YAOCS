@@ -8,6 +8,7 @@
 struct user {
     int id;
     char name[MAX_USER_NAME_LEN];
+    int writing_filedes;
 };
 
 struct message{
@@ -22,6 +23,8 @@ struct message{
  */
 void exit_if(int condition, const char *prefix);
 
-int four_char_to_int(char *bytes);
-void int_to_four_char(int n, char *bytes);
+unsigned int four_char_to_int(char *bytes);
+void int_to_four_char(unsigned int n, char *bytes);
+
+
 #endif
