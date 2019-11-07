@@ -12,7 +12,8 @@
 #include "main.h"
 #include "utils.h"
 
-int id_client = 0;
+unsigned int id_client = 0;
+unsigned int connected = 0;
 
 int main(int argc, char *argv[])
 {
@@ -56,11 +57,20 @@ int init_connection(unsigned int server_fd, unsigned int client_id) {
         pipe(fildes);
         close(fildes[1]);
 
+        char buffer[14];
+        create_header(buffer, 6, client_id);
+        int_to_four_char(fildes[0], &buffer[10]);
+        buffer[8] = CMD_SERVER;
+        buffer[9] = FILE_DESCRIPTOR_TX;
+        send_message_server(server_fd, buffer, id_client);
+
         msg = read_header(fildes[0]);
         recive_message(fildes[0], msg.data, msg.data_len);
 
+        //if (msg.data == "")
+
         ++r;
-    } while (r < MAX_RETRY);
+    } while (r < MAX_RETRY || connected == 1);
 
     return 0;
 }

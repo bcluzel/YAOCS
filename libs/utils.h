@@ -5,7 +5,10 @@
 
 #define SERV_PIPE_NAME "/tmp/chat"
 #define MAX_USER_NAME_LEN 20
+
 #define CMD_SERVER 0x2
+#define FILE_DESCRIPTOR_TX 0x1
+
 struct user {
     int id;
     char name[MAX_USER_NAME_LEN];
@@ -27,5 +30,5 @@ int four_char_to_int(char *bytes);
 void int_to_four_char(int n, char *bytes);
 
 struct message read_header(int fd);
-void recive_mesrsage(int fd, char * data, int data_len);
+void recive_message(int fd, char * data, int data_len);
 #endif
