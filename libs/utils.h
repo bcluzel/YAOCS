@@ -7,8 +7,12 @@
 #define MAX_USER_NAME_LEN 20
 
 #define CMD_SERVER 0x2
+#define CMD_USER '/'
 #define FILE_DESCRIPTOR_TX 0x1
 
+
+
+#define FILE_DESCRIPTOR_RECIVED 0xA0
 struct user {
     int id;
     char name[MAX_USER_NAME_LEN];
@@ -32,4 +36,7 @@ void int_to_four_char(unsigned int n, char *bytes);
 
 struct message read_header(int fd);
 void recive_message(int fd, char * data, int data_len);
+
+void send_message_server(int server_fd, char *message, unsigned int client_id);
+void create_header(char *buffer, int message_len, unsigned int id_client);
 #endif
