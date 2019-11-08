@@ -6,7 +6,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <string.h>
-
+#include <signal.h>
 #include <time.h>
 
 #include "main.h"
@@ -14,17 +14,23 @@
 
 unsigned int id_client = 0;
 unsigned int connected = 0;
+unsigned int server_fd = 0;
 
 int main(int argc, char *argv[])
 {
 
+    signal(SIGINT, intHandler);
+
     srand(time(NULL)); // Initiate random sequence
 
     id_client = id_definer();
-
+    printf("Client id %d \n",id_client);
     printf("YAOCS launched ! \n");
     int running = 1;
     int fd = open(SERV_PIPE_NAME,O_WRONLY);
+
+    server_fd = fd;
+
     if (fd == -1){
         perror("Pas de serv ");
         exit(EXIT_FAILURE);
@@ -58,15 +64,19 @@ int init_connection(unsigned int server_fd, unsigned int client_id) {
         close(fildes[1]);
 
         char buffer[14];
-        create_header(buffer, 6, client_id);
-        int_to_four_char(fildes[0], &buffer[10]);
-        buffer[8] = CMD_SERVER;
-        buffer[9] = FILE_DESCRIPTOR_TX;
-        send_message_server(server_fd, buffer, id_client);
-
+        int_to_four_char(fildes[0], &buffer[3]);
+        buffer[0] = CMD_SERVER;
+        buffer[1] = FILE_DESCRIPTOR_TX;
+        printf("Filedes sended %d \n",fildes[0]);
+        send_message(server_fd, buffer, id_client, 6);
         msg = read_header(fildes[0]);
+        printf("Message len %d", msg.data_len);
         recive_message(fildes[0], msg.data, msg.data_len);
-
+        for (int i = 0; i < msg.data_len; i++)
+        {
+            printf("%d ",msg.data[i]);
+        }
+        
         //if (msg.data == "")
 
         ++r;
@@ -87,4 +97,23 @@ void hello(int server_fd, unsigned int client_id){
     char buffer[8];
     create_header(buffer, 0, client_id);
     exit_if(write(server_fd, buffer, 8) == -1,"hello write");
+}
+
+void intHandler(int dummy) {
+    char  c;
+
+     signal(dummy, SIG_IGN);
+     printf("OUCH, did you hit Ctrl-C?\n"
+            "Do you really want to quit? [y/n] ");
+     c = getchar();
+     if (c == 'y' || c == 'Y') {
+        char buffer[2];
+        buffer[0] = CMD_SERVER;
+        buffer[1] = END_OF_CONNECTION;
+        if (connected)
+            send_message_server(server_fd, buffer, id_client);
+        exit(0);
+     } else
+          signal(SIGINT, intHandler);
+     getchar(); // Get new line character
 }

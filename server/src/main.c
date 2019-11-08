@@ -35,7 +35,7 @@ int main(int argc, char *argv[])
     while (runing)
     {
         struct message message = read_header(fd);
-        printf("%u %u \n",message.user_id,message.data_len);
+        printf("Message recived id:%u len:%u \n",message.user_id,message.data_len);
         if (!message.data_len)
         {
             // Hello process 
@@ -43,6 +43,9 @@ int main(int argc, char *argv[])
 
         }else{
             message.data = malloc(sizeof(char)*message.data_len);
+            recive_message(fd,message.data,message.data_len);
+            printf("Message data id[0] %d \n",message.data[0]);
+            printf("Message data id[0] %d \n",message.data[1]);
             if (message.data[0] == CMD_SERVER)
             {
                 if (message.data[1] == FILE_DESCRIPTOR_TX)
@@ -54,9 +57,7 @@ int main(int argc, char *argv[])
                 
             }else
             {
-                recive_message(fd,message.data,message.data_len);
-                printf("%s",message.data);
-                
+                printf("Message data : %s \n",message.data);
             }
             free(message.data);
         }
@@ -69,6 +70,7 @@ int main(int argc, char *argv[])
 
 
 void process_hello(struct user_bank connected_users, unsigned int user_id){
+    printf("Process hello \n");
     if (!search_user(connected_users,user_id))
     {
         add_user(connected_users,user_id);
@@ -115,12 +117,14 @@ void process_fd(struct user_bank connected_users, struct message msg){
     int index_user = 0;
     if ((index_user = search_user(connected_users, msg.user_id))!=0)
     {
-        connected_users.users[index_user].writing_filedes = four_char_to_int(msg.data +2);
+        int fd = four_char_to_int(msg.data +2);
+        printf("Process_Filedes, recived fd : %d \n",fd);
+        connected_users.users[index_user].writing_filedes = fd;
         char buffer[8];
         int message_len = 1;
         create_header(buffer, message_len, 0u);
-        exit_if(write(connected_users.users[index_user].writing_filedes,buffer,8) == -1,"hello message write");
-        exit_if(write(connected_users.users[index_user].writing_filedes,(char *)FILE_DESCRIPTOR_RECIVED,message_len) == -1,"send serv message write");
+        exit_if(write(fd,buffer,8) == -1,"hello message write");
+        exit_if(write(fd,(char *)FILE_DESCRIPTOR_RECIVED,message_len) == -1,"send serv message write");
 
     }else
     {

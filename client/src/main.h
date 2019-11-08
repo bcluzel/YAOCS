@@ -9,3 +9,5 @@
 unsigned int id_definer(void);
 int init_connection(unsigned int server_fd, unsigned int client_id);
 void hello(int server_fd, unsigned int id_client);
+
+void intHandler(int dummy);
