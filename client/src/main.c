@@ -67,17 +67,23 @@ int init_connection(unsigned int server_fd, unsigned int client_id) {
         int_to_four_char(fildes[0], &buffer[3]);
         buffer[0] = CMD_SERVER;
         buffer[1] = FILE_DESCRIPTOR_TX;
+
         printf("Filedes sended %d \n",fildes[0]);
+        
         send_message(server_fd, buffer, id_client, 6);
         msg = read_header(fildes[0]);
+
         printf("Message len %d", msg.data_len);
+        
         recive_message(fildes[0], msg.data, msg.data_len);
+
         for (int i = 0; i < msg.data_len; i++)
         {
             printf("%d ",msg.data[i]);
         }
         
-        //if (msg.data == "")
+        if (msg.data[0] == CMD_SERVER && msg.data[1] == SERVER_HANDSHAKE)
+            connected = 1;
 
         ++r;
     } while (r < MAX_RETRY || connected == 1);

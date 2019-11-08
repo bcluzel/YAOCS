@@ -10,6 +10,7 @@
 #define CMD_USER '/'
 #define FILE_DESCRIPTOR_TX 0x1
 #define END_OF_CONNECTION  0x2
+#define SERVER_HANDSHAKE   0X3
 
 
 
