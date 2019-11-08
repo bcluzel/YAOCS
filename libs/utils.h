@@ -8,6 +8,7 @@
 
 #define CMD_SERVER 0x2
 #define FILE_DESCRIPTOR_TX 0x1
+#define END_OF_CONNECTION  0x2
 
 struct user {
     int id;

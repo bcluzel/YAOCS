@@ -14,9 +14,12 @@
 
 unsigned int id_client = 0;
 unsigned int connected = 0;
+unsigned int server_fd = 0;
 
 int main(int argc, char *argv[])
 {
+
+    signal(SIGINT, intHandler);
 
     srand(time(NULL)); // Initiate random sequence
 
@@ -25,6 +28,9 @@ int main(int argc, char *argv[])
     printf("YAOCS launched ! \n");
     int running = 1;
     int fd = open(SERV_PIPE_NAME,O_WRONLY);
+
+    server_fd = fd;
+
     if (fd == -1){
         perror("Pas de serv ");
         exit(EXIT_FAILURE);
@@ -99,4 +105,23 @@ void hello(int server_fd, unsigned int client_id){
 void create_header(char *buffer, int message_len, unsigned int id_client){
     int_to_four_char(id_client, buffer);
     int_to_four_char(message_len, &buffer[4]); // message len de 0
+}
+
+void intHandler(int dummy) {
+    char  c;
+
+     signal(dummy, SIG_IGN);
+     printf("OUCH, did you hit Ctrl-C?\n"
+            "Do you really want to quit? [y/n] ");
+     c = getchar();
+     if (c == 'y' || c == 'Y') {
+        char buffer[2];
+        buffer[0] = CMD_SERVER;
+        buffer[1] = END_OF_CONNECTION;
+        if (connected)
+            send_message_server(server_fd, buffer, id_client);
+        exit(0);
+     } else
+          signal(SIGINT, intHandler);
+     getchar(); // Get new line character
 }
