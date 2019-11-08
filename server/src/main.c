@@ -39,7 +39,7 @@ int main(int argc, char *argv[])
         if (!message.data_len)
         {
             // Hello process 
-            process_hello(connected_users,message.user_id);
+            process_hello(&connected_users,message.user_id);
 
         }else{
             message.data = malloc(sizeof(char)*message.data_len);
@@ -50,7 +50,7 @@ int main(int argc, char *argv[])
             {
                 if (message.data[1] == FILE_DESCRIPTOR_TX)
                 {
-                    process_fd(connected_users,message);
+                    process_fd(&connected_users,message);
                 }
                 
             }else if (message.data[0] == CMD_USER){
@@ -69,10 +69,11 @@ int main(int argc, char *argv[])
 }
 
 
-void process_hello(struct user_bank connected_users, unsigned int user_id){
+void process_hello(struct user_bank * connected_users, unsigned int user_id){
     printf("Process hello \n");
     if (!search_user(connected_users,user_id))
     {
+        printf("Adding user \n");
         add_user(connected_users,user_id);
     }else{
         perror("User already exist");
@@ -81,10 +82,10 @@ void process_hello(struct user_bank connected_users, unsigned int user_id){
     
 }
 
-unsigned int search_user(struct user_bank connected_users, unsigned int user_id){
-    for (int i = 0; i < connected_users.num_of_users; i++)
+unsigned int search_user(struct user_bank *connected_users, unsigned int user_id){
+    for (int i = 0; i < connected_users->num_of_users; i++)
     {
-        if (user_id == connected_users.users[i].id)
+        if (user_id == connected_users->users[i].id)
         {
             return i;
         }
@@ -93,33 +94,34 @@ unsigned int search_user(struct user_bank connected_users, unsigned int user_id)
     return 0;
 }
 
-int add_user(struct user_bank connected_users, unsigned int user_id){
-    struct user *next_users = malloc (sizeof(struct user) * (connected_users.num_of_users+1));
-    for (int i = 0; i < connected_users.num_of_users; i++)
+int add_user(struct user_bank *connected_users, unsigned int user_id){
+    struct user *next_users = malloc (sizeof(struct user) * (connected_users->num_of_users+1));
+    for (int i = 0; i < connected_users->num_of_users; i++)
     {
-        next_users[i] = connected_users.users[i];
+        next_users[i] = connected_users->users[i];
     }
-    free(connected_users.users);
-    connected_users.num_of_users ++;
-    connected_users.users = next_users;
+    free(connected_users->users);
+    connected_users->num_of_users ++;
+    printf("User : %d \n",connected_users->num_of_users);
+    connected_users->users = next_users;
     return 0;
 }
 
-int delete_user(struct user_bank connected_users, unsigned int user_id){
+int delete_user(struct user_bank *connected_users, unsigned int user_id){
     return 0;
 }
 
-int change_user_name(struct user_bank connected_users, unsigned int user_id, char * username){
+int change_user_name(struct user_bank *connected_users, unsigned int user_id, char * username){
     return 0;
 }
 
-void process_fd(struct user_bank connected_users, struct message msg){
+void process_fd(struct user_bank *connected_users, struct message msg){
     int index_user = 0;
     if ((index_user = search_user(connected_users, msg.user_id))!=0)
     {
         int fd = four_char_to_int(msg.data +2);
         printf("Process_Filedes, recived fd : %d \n",fd);
-        connected_users.users[index_user].writing_filedes = fd;
+        connected_users->users[index_user].writing_filedes = fd;
         char buffer[8];
         int message_len = 1;
         create_header(buffer, message_len, 0u);
