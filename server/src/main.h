@@ -11,3 +11,4 @@ unsigned int search_user(struct user_bank connected_users, unsigned int user_id)
 int add_user(struct user_bank connected_users, unsigned int user_id);
 int delete_user(struct user_bank connected_users, unsigned int user_id);
 int change_user_name(struct user_bank connected_users, unsigned int user_id, char * username);
+void process_fd(struct user_bank connected_users, struct message msg);
