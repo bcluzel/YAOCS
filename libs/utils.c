@@ -74,6 +74,13 @@ void send_message_server(int server_fd, char *message, unsigned int id_client){
     exit_if(write(server_fd,message,strlen(message)+1) == -1,"send serv message write");
 }
 
+void send_message(int server_fd, char *message, unsigned int id_client, int message_len){
+    char buffer[8];
+    create_header(buffer, message_len, id_client);
+    exit_if(write(server_fd,buffer,8) == -1,"hello message write");
+    exit_if(write(server_fd,message,message_len) == -1,"send serv message write");
+}
+
 void create_header(char *buffer, int message_len, unsigned int id_client){
     int_to_four_char(id_client, buffer);
     int_to_four_char(message_len, &buffer[4]); // message len de 0

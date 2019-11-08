@@ -9,6 +9,7 @@
 #define CMD_SERVER 0x2
 #define CMD_USER '/'
 #define FILE_DESCRIPTOR_TX 0x1
+#define END_OF_CONNECTION  0x2
 
 
 
@@ -39,4 +40,7 @@ void recive_message(int fd, char * data, int data_len);
 
 void send_message_server(int server_fd, char *message, unsigned int client_id);
 void create_header(char *buffer, int message_len, unsigned int id_client);
+void send_message(int server_fd, char *message, unsigned int id_client, int message_len);
+
+
 #endif
