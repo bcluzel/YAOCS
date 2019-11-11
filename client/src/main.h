@@ -1,3 +1,12 @@
+
+struct client_info
+{
+    unsigned int id;
+    int fd;
+};
+
+
+
 // MSG TO USER
 
 #define ERR_CLIENT_TIMEOUT "Server connection request timedout ..."
@@ -7,7 +16,7 @@
 #define MAX_RETRY 50
 
 unsigned int id_definer(void);
-int init_connection(unsigned int server_fd, unsigned int client_id);
+struct client_info init_connection(unsigned int server_fd);
 void hello(int server_fd, unsigned int id_client);
 
 void intHandler(int dummy);

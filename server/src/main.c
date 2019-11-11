@@ -44,13 +44,11 @@ int main(int argc, char *argv[])
         }else{
             message.data = malloc(sizeof(char)*message.data_len);
             recive_message(fd,message.data,message.data_len);
-            //printf("Message data id[0] %d \n",message.data[0]);
-            //printf("Message data id[0] %d \n",message.data[1]);
-            if (message.data[0] == CMD_SERVER)
+            if (message.data[0] == CMD_SERVER) 
             {
-                if (message.data[1] == FILE_DESCRIPTOR_TX)
+                if (message.data[1] == END_OF_CONNECTION)
                 {
-                    process_fd(&connected_users,message);
+                    // TODO PROCESS EOC
                 }
                 
             }else if (message.data[0] == CMD_USER){
@@ -97,7 +95,8 @@ unsigned int search_user(struct user_bank *connected_users, unsigned int user_id
 int add_user(struct user_bank *connected_users, unsigned int user_id){
     struct user new_user;
     new_user.id = user_id;
-    
+    new_user.fd = open_client_connection(user_id);
+
     struct user *next_users = malloc (sizeof(struct user) * (connected_users->num_of_users+1));
     for (int i = 0; i < connected_users->num_of_users; i++)
     {
@@ -109,6 +108,7 @@ int add_user(struct user_bank *connected_users, unsigned int user_id){
     connected_users->users = next_users;
     connected_users->users[connected_users->num_of_users-1] = new_user;
     printf("User id: %u \n",connected_users->users[0].id);
+
     return 0;
 }
 
@@ -120,23 +120,12 @@ int change_user_name(struct user_bank *connected_users, unsigned int user_id, ch
     return 0;
 }
 
-void process_fd(struct user_bank *connected_users, struct message msg){
-    int index_user = 0;
-    if ((index_user = search_user(connected_users, msg.user_id))!=0)
-    {
-        int fd = four_char_to_int(msg.data +2);
-        printf("Process_Filedes, recived fd : %u \n",fd);
-        connected_users->users[index_user].writing_filedes = fd;
-        char buffer[8];
-        int message_len = 1;
-        create_header(buffer, message_len, 0u);
-        exit_if(write(fd,buffer,8) == -1,"hello message write");
-        exit_if(write(fd,(char *)FILE_DESCRIPTOR_RECIVED,message_len) == -1,"send serv message write");
-
-    }else
-    {
-        perror("process fd : User not found, hello sended ?");
-    }
-    
-    
+int open_client_connection(unsigned int user_id){
+    char buffer[PIPE_FOLDER_PLUS_INTREP_LEN];
+    char * path_mkfifo = path_mkfifo_client(user_id,buffer);
+    printf("Client fifo location : %s \n", buffer);
+    int fd = open(path_mkfifo, O_WRONLY);
+    exit_if(fd == -1, "open open_client_connection");
+    send_message_str(fd, "Salut ! \n" , ID_SERVER);
+    return fd;
 }
