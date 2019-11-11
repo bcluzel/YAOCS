@@ -24,7 +24,7 @@ int main(int argc, char *argv[])
     srand(time(NULL)); // Initiate random sequence
 
     id_client = id_definer();
-    printf("Client id %d \n",id_client);
+    printf("Client id %u \n",id_client);
     printf("YAOCS launched ! \n");
     int running = 1;
     int fd = open(SERV_PIPE_NAME,O_WRONLY);
@@ -64,10 +64,15 @@ int init_connection(unsigned int server_fd, unsigned int client_id) {
         close(fildes[1]);
 
         char buffer[14];
-        int_to_four_char(fildes[0], &buffer[3]);
         buffer[0] = CMD_SERVER;
         buffer[1] = FILE_DESCRIPTOR_TX;
-        printf("Filedes sended %d \n",fildes[0]);
+        int_to_four_char(fildes[0], &buffer[2]);
+        // printf("Filedes %u \n",fildes[0]);
+        //         for (int i = 0; i < 6; i++)
+        // {
+        //     printf("! %u ",buffer[i]);
+        // }
+        // printf("\n");
         send_message(server_fd, buffer, id_client, 6);
         msg = read_header(fildes[0]);
         printf("Message len %d", msg.data_len);

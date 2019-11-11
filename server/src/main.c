@@ -44,8 +44,8 @@ int main(int argc, char *argv[])
         }else{
             message.data = malloc(sizeof(char)*message.data_len);
             recive_message(fd,message.data,message.data_len);
-            printf("Message data id[0] %d \n",message.data[0]);
-            printf("Message data id[0] %d \n",message.data[1]);
+            //printf("Message data id[0] %d \n",message.data[0]);
+            //printf("Message data id[0] %d \n",message.data[1]);
             if (message.data[0] == CMD_SERVER)
             {
                 if (message.data[1] == FILE_DESCRIPTOR_TX)
@@ -95,6 +95,9 @@ unsigned int search_user(struct user_bank *connected_users, unsigned int user_id
 }
 
 int add_user(struct user_bank *connected_users, unsigned int user_id){
+    struct user new_user;
+    new_user.id = user_id;
+    
     struct user *next_users = malloc (sizeof(struct user) * (connected_users->num_of_users+1));
     for (int i = 0; i < connected_users->num_of_users; i++)
     {
@@ -102,8 +105,10 @@ int add_user(struct user_bank *connected_users, unsigned int user_id){
     }
     free(connected_users->users);
     connected_users->num_of_users ++;
-    printf("User : %d \n",connected_users->num_of_users);
+    printf("User : %u \n",connected_users->num_of_users);
     connected_users->users = next_users;
+    connected_users->users[connected_users->num_of_users-1] = new_user;
+    printf("User id: %u \n",connected_users->users[0].id);
     return 0;
 }
 
@@ -120,7 +125,7 @@ void process_fd(struct user_bank *connected_users, struct message msg){
     if ((index_user = search_user(connected_users, msg.user_id))!=0)
     {
         int fd = four_char_to_int(msg.data +2);
-        printf("Process_Filedes, recived fd : %d \n",fd);
+        printf("Process_Filedes, recived fd : %u \n",fd);
         connected_users->users[index_user].writing_filedes = fd;
         char buffer[8];
         int message_len = 1;
