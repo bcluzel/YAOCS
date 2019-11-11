@@ -4,6 +4,7 @@
 
 
 #define SERV_PIPE_NAME "/tmp/chat"
+#define PIPE_DEFAULT_FOLDER "/tmp/"
 #define MAX_USER_NAME_LEN 20
 
 #define CMD_SERVER 0x2
