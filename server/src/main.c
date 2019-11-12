@@ -6,6 +6,8 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <errno.h>
+#include <string.h>
+
 
 #include "main.h"
 #include "utils.h"
@@ -96,6 +98,7 @@ int add_user(struct user_bank *connected_users, unsigned int user_id){
     struct user new_user;
     new_user.id = user_id;
     new_user.fd = open_client_connection(user_id);
+    strcpy(new_user.name,DEFAULT_NAME);
 
     struct user *next_users = malloc (sizeof(struct user) * (connected_users->num_of_users+1));
     for (int i = 0; i < connected_users->num_of_users; i++)

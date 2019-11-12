@@ -14,13 +14,11 @@
 #include "main.h"
 #include "utils.h"
 
-unsigned int id_client = 0;
-unsigned int connected = 0;
+struct client_info client;
 unsigned int server_fd = 0;
 
 int main(int argc, char *argv[])
 {
-
     signal(SIGINT, intHandler);
 
     srand(time(NULL)); // Initiate random sequence
@@ -36,7 +34,7 @@ int main(int argc, char *argv[])
         exit(EXIT_FAILURE);
         //exec delay retry
     }
-    struct client_info client = init_connection(fd);
+    client = init_connection(fd);
 
     while (running)
     {
@@ -46,7 +44,7 @@ int main(int argc, char *argv[])
         printf("From %d : %s \n",message.user_id, message.data);
         free(message.data);
     }
-    
+    end_of_connection();
     close(fd);
     return EXIT_SUCCESS;
 }
@@ -64,11 +62,11 @@ struct client_info init_connection(unsigned int server_fd) {
         if (mkfifo(buffer, 0666) == -1)
         {
             int errsv = errno;
-            if(errsv != EEXIST){
+            if(errsv == EEXIST){
                 fifo_created = 0;
             }else
             {
-                perror("init connection mkfifo \n");
+                perror("init connection mkfifo");
             }
             
         }else
@@ -79,6 +77,7 @@ struct client_info init_connection(unsigned int server_fd) {
     printf("Client fifo location : %s \n", buffer);
     hello(server_fd, client.id);
     exit_if((client.fd = open(buffer,O_RDONLY)) == -1, "OPEN init_connection \n");
+    client.connected = 1;
     printf("Init OK ! \n");
     return client;
 }
@@ -100,18 +99,29 @@ void hello(int server_fd, unsigned int client_id){
 void intHandler(int dummy) {
     char  c;
 
-     signal(dummy, SIG_IGN);
-     printf("\rOUCH, did you hit Ctrl-C?\n"
-            "Do you really want to quit? [Y/n] ");
-     c = getchar();
-     if (c == 'y' || c == 'Y') {
-        char buffer[2];
-        buffer[0] = CMD_SERVER;
-        buffer[1] = END_OF_CONNECTION;
-        if (connected)
-            send_message(server_fd, buffer, id_client, 2);
-        exit(0);
-     } else
-          signal(SIGINT, intHandler);
-     getchar(); // Get new line character
+    signal(dummy, SIG_IGN);
+    printf("\rOUCH, did you hit Ctrl-C?\n"
+        "Do you really want to quit? [Y/n] ");
+    c = getchar();
+    if (c == 'y' || c == 'Y') {
+    end_of_connection();
+    exit(0);
+    } else
+        signal(SIGINT, intHandler);
+    getchar(); // Get new line character
+}
+
+void end_of_connection(){
+    char buffer_path[PIPE_FOLDER_PLUS_INTREP_LEN];
+    char buffer[2];
+    buffer[0] = CMD_SERVER;
+    buffer[1] = END_OF_CONNECTION;
+    if (client.connected){
+        send_message(server_fd, buffer, client.id, 2);
+        close(client.fd);
+        path_mkfifo_client(client.id,buffer_path);
+        printf("path : %s \n",buffer_path);
+        exit_if(remove(buffer_path)==-1,"remove end of connection");
+        client.connected = 0;
+    }
 }
