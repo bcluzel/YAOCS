@@ -14,7 +14,7 @@ struct client_info
 
 // FCT DECLARATION
 
-#define MAX_RETRY 50
+#define MAX_RETRY 1
 
 unsigned int id_definer(void);
 struct client_info init_connection(unsigned int server_fd);
