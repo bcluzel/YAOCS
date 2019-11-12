@@ -55,13 +55,17 @@ int read_header_nb(int fd, struct message *answer){
     int header_readed = 0;
     int answer_read = read(fd,&buffer[head],1);
 
-    if (errno == EAGAIN)
+    if (answer_read == -1)
     {
-    }else
-    {
-        exit_if(answer_read == -1, "read read_header");
+        if (errno == EAGAIN)
+        {
+            return header_readed;
+        }else
+        {
+            perror("read read_header");
+            exit(1);
+        }   
     }
-    
     
     head += answer_read;
     if (head >= 8)
