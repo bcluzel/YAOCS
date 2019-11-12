@@ -25,7 +25,7 @@ int main(int argc, char *argv[])
 
     printf("YAOCS launched ! \n");
     int running = 1;
-    int fd = open(SERV_PIPE_NAME,O_WRONLY);
+    int fd = open(SERV_PIPE_NAME,O_WRONLY | O_NONBLOCK);
 
     server_fd = fd;
 
@@ -77,7 +77,7 @@ struct client_info init_connection(unsigned int server_fd) {
     } while (!fifo_created);
     printf("Client fifo location : %s \n", buffer);
     hello(server_fd, client.id);
-    exit_if((client.fd = open(buffer,O_RDONLY)) == -1, "OPEN init_connection \n");
+    exit_if((client.fd = open(buffer,O_RDONLY | O_NONBLOCK)) == -1, "OPEN init_connection \n");
     client.connected = 1;
     printf("Init OK ! \n");
     return client;
