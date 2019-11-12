@@ -31,7 +31,7 @@ int main(int argc, char *argv[])
         }
     }
     
-    int fd = open(SERV_PIPE_NAME, O_RDONLY | O_CREAT);
+    int fd = open(SERV_PIPE_NAME, O_RDONLY | O_CREAT | O_NONBLOCK);
     exit_if(fd == -1, "fopen SERV_PIPE_NAME");
     struct message message;
     while (running)
