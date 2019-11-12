@@ -7,7 +7,7 @@
 #define PIPE_DEFAULT_FOLDER "/tmp/"
 #define PIPE_FOLDER_PLUS_INTREP_LEN 18
 #define MAX_USER_NAME_LEN 20
-
+#define MAX_MESSAGE_LEN 254
 #define CMD_SERVER 0x2
 #define CMD_USER '/'
 #define END_OF_CONNECTION  0x1
@@ -44,5 +44,5 @@ void send_message_str(int server_fd, char *message, unsigned int client_id);
 void create_header(char *buffer, int message_len, unsigned int id_client);
 void send_message(int server_fd, char *message, unsigned int id_client, int message_len);
 char * path_mkfifo_client(unsigned int id_client, char *buffer);
-
+int read_stdin(char *buffer);
 #endif
