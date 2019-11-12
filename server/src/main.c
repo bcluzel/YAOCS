@@ -20,7 +20,7 @@ int main(int argc, char *argv[])
     connected_users.num_of_users = 0;
     connected_users.users = NULL;
 
-    int runing = 1;
+    int running = 1;
 
     if (mkfifo(SERV_PIPE_NAME, 0666) == -1)
     {
@@ -33,35 +33,35 @@ int main(int argc, char *argv[])
     
     int fd = open(SERV_PIPE_NAME, O_RDONLY | O_CREAT);
     exit_if(fd == -1, "fopen SERV_PIPE_NAME");
-
-    while (runing)
+    struct message message;
+    while (running)
     {
-        struct message message = read_header(fd);
-        printf("Message recived id:%u len:%u \n",message.user_id,message.data_len);
-        if (!message.data_len)
-        {
-            // Hello process 
-            process_hello(&connected_users,message.user_id);
+        if(read_header_nb(fd,&message)){
+            printf("Message recived id:%u len:%u \n",message.user_id,message.data_len);
+            if (!message.data_len)
+            {
+                // Hello process 
+                process_hello(&connected_users,message.user_id);
 
-        }else{
-            message.data = malloc(sizeof(char)*message.data_len);
-            recive_message(fd,message.data,message.data_len);
-            if (message.data[0] == CMD_SERVER) 
-            {
-                if (message.data[1] == END_OF_CONNECTION)
+            }else{
+                message.data = malloc(sizeof(char)*message.data_len);
+                recive_message(fd,message.data,message.data_len);
+                if (message.data[0] == CMD_SERVER) 
                 {
-                    // TODO PROCESS EOC
+                    if (message.data[1] == END_OF_CONNECTION)
+                    {
+                        // TODO PROCESS EOC
+                    }
+                    
+                }else if (message.data[0] == CMD_USER){
+                    
+                }else
+                {
+                    printf("Message data : %s \n",message.data);
                 }
-                
-            }else if (message.data[0] == CMD_USER){
-                
-            }else
-            {
-                printf("Message data : %s \n",message.data);
+                free(message.data);
             }
-            free(message.data);
         }
-        
     }
     
     close(fd);

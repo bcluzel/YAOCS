@@ -35,14 +35,15 @@ int main(int argc, char *argv[])
         //exec delay retry
     }
     client = init_connection(fd);
-
+    struct message message;
     while (running)
     {
-        struct message message = read_header(client.fd);
-        message.data = malloc(sizeof(char)*message.data_len);
-        recive_message(client.fd,message.data,message.data_len);
-        printf("From %d : %s \n",message.user_id, message.data);
-        free(message.data);
+        if(read_header_nb(client.fd,&message)){
+            message.data = malloc(sizeof(char)*message.data_len);
+            recive_message(client.fd,message.data,message.data_len);
+            printf("> %d : %s \n",message.user_id, message.data);
+            free(message.data);
+        }
     }
     end_of_connection();
     close(fd);
