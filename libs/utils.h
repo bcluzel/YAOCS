@@ -12,7 +12,7 @@
 #define CMD_USER '/'
 #define END_OF_CONNECTION  0x1
 
-
+#define DEFAULT_NAME "Bobby"
 
 #define FILE_DESCRIPTOR_RECIVED 0xA0
 struct user {

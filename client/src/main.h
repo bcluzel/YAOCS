@@ -3,6 +3,7 @@ struct client_info
 {
     unsigned int id;
     int fd;
+    int connected;
 };
 
 
@@ -18,5 +19,6 @@ struct client_info
 unsigned int id_definer(void);
 struct client_info init_connection(unsigned int server_fd);
 void hello(int server_fd, unsigned int id_client);
+void end_of_connection();
 
 void intHandler(int dummy);
