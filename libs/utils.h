@@ -37,6 +37,7 @@ unsigned int four_char_to_int(char *bytes);
 void int_to_four_char(unsigned int n, char *bytes);
 
 struct message read_header(int fd);
+int read_header_nb(int fd, struct message *answer);
 void recive_message(int fd, char * data, int data_len);
 
 void send_message_str(int server_fd, char *message, unsigned int client_id);

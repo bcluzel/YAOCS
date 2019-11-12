@@ -40,12 +40,6 @@ struct message read_header(int fd){
         int answer_read = read(fd,&buffer[head],1);
         exit_if(answer_read == -1, "read read_header");
         head += answer_read;
-        /*
-        if (answer_read == 0)
-        {
-            sleep(1);
-        }
-        */
     }
     head = 0;
     struct message answer;
@@ -54,6 +48,28 @@ struct message read_header(int fd){
     return answer;
 }
 
+int read_header_nb(int fd, struct message *answer){
+
+    static char buffer [NUMBER_OF_BYTES_IN_HEADER];
+    static int head=0;
+    int header_readed = 0;
+    int answer_read = read(fd,&buffer[head],1);
+    exit_if(answer_read == -1, "read read_header");
+    head += answer_read;
+    if (head >= 8)
+    {
+        head = 0;
+        answer->user_id = four_char_to_int(&buffer[0]);
+        answer->data_len = four_char_to_int(&buffer[4]);
+        header_readed = 1;
+    }else
+    {
+        header_readed = 0;
+    }
+    
+    
+    return header_readed;
+}
 
 void recive_message(int fd, char * data, int data_len){
     int head=0;
