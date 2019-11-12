@@ -57,7 +57,7 @@ int main(int argc, char *argv[])
                     
                 }else
                 {
-                    printf("Message data : %s \n",message.data);
+                    printf("Message data : %s ",message.data);
                 }
                 free(message.data);
             }
