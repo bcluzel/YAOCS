@@ -36,6 +36,7 @@ int main(int argc, char *argv[])
     }
     client = init_connection(fd);
     struct message message;
+    char buffer_out[MAX_MESSAGE_LEN+1];
     while (running)
     {
         if(read_header_nb(client.fd,&message)){
@@ -43,6 +44,9 @@ int main(int argc, char *argv[])
             recive_message(client.fd,message.data,message.data_len);
             printf("> %d : %s \n",message.user_id, message.data);
             free(message.data);
+        }
+        if(read_stdin(buffer_out)){
+            send_message_str(fd,buffer_out,client.id);
         }
     }
     end_of_connection();

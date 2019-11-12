@@ -7,6 +7,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <errno.h>
+#include <unistd.h>
 
 #include "utils.h"
 
@@ -118,4 +119,38 @@ void create_header(char *buffer, int message_len, unsigned int id_client){
 char * path_mkfifo_client(unsigned int id_client, char *buffer){
     sprintf(buffer,"%s%u",PIPE_DEFAULT_FOLDER,id_client);
     return buffer;
+}
+
+int read_stdin(char *buffer){
+
+    static int head=0;
+    int header_readed=0;
+    int answer_read = read(STDIN_FILENO,&buffer[head],1);
+    if (answer_read == -1)
+    {
+        if (errno == EAGAIN)
+        {
+            return header_readed;
+        }else
+        {
+            perror("read read_header");
+            exit(1);
+        }   
+    }else
+    {
+        if (head >= MAX_MESSAGE_LEN || buffer[head] == 10)
+        {
+            buffer[head+1] = '\0';
+            head = 0;
+            answer_read = 0;
+            header_readed = 1;
+        }else
+        {
+            header_readed = 0;
+        }
+        head += answer_read;
+    }
+    
+    
+    return header_readed;
 }
