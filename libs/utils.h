@@ -5,6 +5,7 @@
 
 #define SERV_PIPE_NAME "/tmp/chat"
 #define PIPE_DEFAULT_FOLDER "/tmp/"
+#define LOCK_DEFAULT_FILE "/tmp/lock"
 #define PIPE_FOLDER_PLUS_INTREP_LEN 18
 #define MAX_USER_NAME_LEN 20
 #define MAX_MESSAGE_LEN 254
@@ -40,9 +41,10 @@ struct message read_header(int fd);
 int read_header_nb(int fd, struct message *answer);
 void recive_message(int fd, char * data, int data_len);
 
+void send_message(int server_fd, char *message, unsigned int id_client, int message_len);
 void send_message_str(int server_fd, char *message, unsigned int client_id);
 void create_header(char *buffer, int message_len, unsigned int id_client);
-void send_message(int server_fd, char *message, unsigned int id_client, int message_len);
 char * path_mkfifo_client(unsigned int id_client, char *buffer);
 int read_stdin(char *buffer);
+
 #endif
