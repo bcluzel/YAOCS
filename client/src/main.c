@@ -39,6 +39,7 @@ int main(int argc, char *argv[])
     char buffer_out[MAX_MESSAGE_LEN+1];
     while (running)
     {
+        usleep(500);
         if(read_header_nb(client.fd,&message)){
             message.data = malloc(sizeof(char)*message.data_len);
             recive_message(client.fd,message.data,message.data_len);
