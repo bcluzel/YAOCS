@@ -36,6 +36,7 @@ int main(int argc, char *argv[])
     struct message message;
     while (running)
     {
+        usleep(500);
         if(read_header_nb(fd,&message)){
             printf("Message recived id:%u len:%u \n",message.user_id,message.data_len);
             if (!message.data_len)
