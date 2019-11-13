@@ -47,7 +47,7 @@ int main(int argc, char *argv[])
             free(message.data);
         }
         if(read_stdin(buffer_out)){
-            send_message_str(fd,buffer_out,client.id);
+            send_message_str_server(fd,buffer_out,client.id);
         }
     }
     end_of_connection();
@@ -121,11 +121,39 @@ void end_of_connection(){
     buffer[0] = CMD_SERVER;
     buffer[1] = END_OF_CONNECTION;
     if (client.connected){
-        send_message(server_fd, buffer, client.id, 2);
+        send_message_server(server_fd, buffer, client.id, 2);
         close(client.fd);
         path_mkfifo_client(client.id,buffer_path);
         printf("path : %s \n",buffer_path);
         exit_if(remove(buffer_path)==-1,"remove end of connection");
         client.connected = 0;
     }
+}
+
+void lock(void){
+    while (open(LOCK_DEFAULT_FILE, O_WRONLY|O_CREAT) == -1)
+    {
+        if (errno != EEXIST && errno != EACCES)
+        {
+            perror("Error lock");
+            exit(EXIT_FAILURE);
+        }
+        
+        usleep(10);
+    }
+}
+
+void unlock(void){
+    exit_if(remove(LOCK_DEFAULT_FILE) == -1,"remove Unlock");
+}
+
+void send_message_str_server(int server_fd, char *message, unsigned int client_id){
+    lock();
+    send_message_str(server_fd,message,client_id);
+    unlock();
+}
+void send_message_server(int server_fd, char *message, unsigned int client_id, int message_len){
+    lock();
+    send_message(server_fd,message,client_id,message_len);
+    unlock();
 }
