@@ -58,17 +58,15 @@ int main(int argc, char *argv[])
                         
                     }else
                     {
-                        printf("Message data : %s ",message.data);
+                        printf("Message data : %s",message.data);
                         broadcast_str(&connected_users,message.data);
                     }
                 }else
                 {
-                    printf("Message data : %s ",message.data);
+                    printf("Message data : %s",message.data);
                     broadcast_str(&connected_users,message.data);
                 }
                 
-                
-
                 free(message.data);
             }
         }

@@ -44,12 +44,12 @@ int main(int argc, char *argv[])
         if(read_header_nb(client.fd,&message)){
             message.data = malloc(sizeof(char)*message.data_len);
             recive_message(client.fd,message.data,message.data_len);
-            printf("%s\n", message.data);
+            printf(message.data);
             free(message.data);
         }
-        if(read_stdin(buffer_out)){
-            send_message_str_server(fd,buffer_out,client.id);
-        }
+        //if(read_stdin(buffer_out)){
+        //    send_message_str_server(fd,buffer_out,client.id);
+        //}
     }
     end_of_connection();
     close(fd);
