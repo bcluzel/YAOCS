@@ -37,13 +37,14 @@ int main(int argc, char *argv[])
     client = init_connection(fd);
     struct message message;
     char buffer_out[MAX_MESSAGE_LEN+1];
+    printf("  Connected to the server ! \n");
     while (running)
     {
         usleep(500);
         if(read_header_nb(client.fd,&message)){
             message.data = malloc(sizeof(char)*message.data_len);
             recive_message(client.fd,message.data,message.data_len);
-            printf("> %d : %s \n",message.user_id, message.data);
+            printf("%s\n", message.data);
             free(message.data);
         }
         if(read_stdin(buffer_out)){
@@ -97,7 +98,9 @@ unsigned int id_definer(void) {
 void hello(int server_fd, unsigned int client_id){
     char buffer[8];
     create_header(buffer, 0, client_id);
+    lock();
     exit_if(write(server_fd, buffer, 8) == -1,"hello write");
+    unlock();
 }
 
 void intHandler(int dummy) {
@@ -124,7 +127,6 @@ void end_of_connection(){
         send_message_server(server_fd, buffer, client.id, 2);
         close(client.fd);
         path_mkfifo_client(client.id,buffer_path);
-        printf("path : %s \n",buffer_path);
         exit_if(remove(buffer_path)==-1,"remove end of connection");
         client.connected = 0;
     }
