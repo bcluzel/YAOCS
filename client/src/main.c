@@ -5,6 +5,7 @@
 #include <fcntl.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/wait.h>
 #include <string.h>
 #include <signal.h>
 #include <time.h>
@@ -16,15 +17,15 @@
 
 struct client_info client;
 unsigned int server_fd = 0;
+int running;
 
 int main(int argc, char *argv[])
 {
-    signal(SIGINT, intHandler);
 
     srand(time(NULL)); // Initiate random sequence
 
     printf("\n  YAOCS launched ! \n");
-    int running = 1;
+    running = 1;
     int fd = open(SERV_PIPE_NAME,O_WRONLY | O_NONBLOCK);
 
     server_fd = fd;
@@ -35,24 +36,50 @@ int main(int argc, char *argv[])
         //exec delay retry
     }
     client = init_connection(fd);
-    struct message message;
     char buffer_out[MAX_MESSAGE_LEN+1];
     printf("  Connected to the server ! \n");
-    while (running)
-    {
-        usleep(500);
-        if(read_header_nb(client.fd,&message)){
-            message.data = malloc(sizeof(char)*message.data_len);
-            recive_message(client.fd,message.data,message.data_len);
-            printf(message.data);
-            free(message.data);
-        }
-        //if(read_stdin(buffer_out)){
-        //    send_message_str_server(fd,buffer_out,client.id);
-        //}
-    }
-    end_of_connection();
-    close(fd);
+    struct message message;
+    switch(fork()) {
+        case -1: exit_if(1, "Can't fork");
+        case 0: //Son
+            while (running)
+                {
+                    usleep(500);
+                    if(read_stdin(buffer_out)){
+                        if (!strcmp(buffer_out,"/exit\n"))
+                        {
+                            printf("Exiting !\n");
+                            printf(buffer_out);
+                            kill(getppid(),SIGUSR1);
+                            running = 0;
+                        }else
+                        {
+                            send_message_str_server(fd,buffer_out,client.id);
+                        }
+                        
+                    }
+                }
+            break;
+            
+        default: //Dad
+            signal(SIGINT, intHandler);
+            signal(SIGUSR1, cleanExit);
+            while (running)
+            {
+                usleep(500);
+                if(read_header_nb(client.fd,&message)){
+                    message.data = malloc(sizeof(char)*message.data_len);
+                    recive_message(client.fd,message.data,message.data_len);
+                    printf(message.data);
+                    free(message.data);
+                }
+            }
+            end_of_connection();
+            close(fd);
+            int wstatus;
+            wait(&wstatus);
+            break;
+    };
     return EXIT_SUCCESS;
 }
 
@@ -104,18 +131,15 @@ void hello(int server_fd, unsigned int client_id){
 }
 
 void intHandler(int dummy) {
-    char  c;
-
-    signal(dummy, SIG_IGN);
-    printf("\rOUCH, did you hit Ctrl-C?\n"
-        "Do you really want to quit? [Y/n] ");
-    c = getchar();
-    if (c == 'y' || c == 'Y') {
+    //signal(dummy, SIG_IGN);
     end_of_connection();
+    int wstatus;
+    wait(&wstatus); //wait child to end
     exit(0);
-    } else
-        signal(SIGINT, intHandler);
-    getchar(); // Get new line character
+}
+
+void cleanExit(int dummy){
+    running = 0;
 }
 
 void end_of_connection(){
