@@ -27,3 +27,4 @@ void lock(void);
 void unlock(void);
 
 void intHandler(int dummy);
+void cleanExit(int dummy);
