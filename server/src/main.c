@@ -55,16 +55,17 @@ int main(int argc, char *argv[])
                             delete_user(&connected_users, message.user_id);
                         }
                     }else if (message.data[0] == CMD_USER){
-                        
+                        printf("UserCmd %s",message.data +1);
+                        // TODO /help /users /msg /changename
                     }else
                     {
                         printf("Message data : %s",message.data);
-                        broadcast_str(&connected_users,message.data);
+                        broadcast_str_excluding(&connected_users,message.data,message.user_id);
                     }
                 }else
                 {
                     printf("Message data : %s",message.data);
-                    broadcast_str(&connected_users,message.data);
+                    broadcast_str_excluding(&connected_users,message.data,message.user_id);
                 }
                 
                 free(message.data);
@@ -95,7 +96,6 @@ int search_user(struct user_bank *connected_users, unsigned int user_id){
     {
         if (user_id == connected_users->users[i].id)
         {
-            printf(">%d\n",i);
             return i;
         }
         
@@ -170,5 +170,16 @@ void broadcast_str(struct user_bank *users, char * message){
     {
         printf("Broadcast to user %d\n",i);
         send_message_str(users->users[i].fd,message,0);
+    }
+}
+
+void broadcast_str_excluding(struct user_bank *users, char * message, int excluded_id){
+    for (int i = 0; i < users->num_of_users; i++)
+    {
+        if (users->users[i].id != excluded_id)
+        {
+            printf("Broadcast to user %d\n",i);
+            send_message_str(users->users[i].fd,message,0);
+        }
     }
 }
