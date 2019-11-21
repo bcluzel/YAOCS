@@ -15,6 +15,18 @@
 int running;
 int main(int argc, char *argv[])
 {
+    /*
+    switch(fork()) { //daemon
+        case -1: exit_if(1, "Can't fork");
+        case 0: //Son
+            if (setsid() < 0)
+                exit(EXIT_FAILURE);
+            break;        
+        default: //Dad
+            exit(EXIT_FAILURE);
+            break;
+    };
+    */
     signal(SIGINT, intHandler);
 
     printf("Server launched ! \n");
@@ -73,8 +85,6 @@ int main(int argc, char *argv[])
                             process_msg(&connected_users, message);
                         }
 
-
-                        
                     }else
                     {
                         printf("Message data : %s",message.data);
@@ -90,14 +100,13 @@ int main(int argc, char *argv[])
             }
         }
     }
-    close(fd);
+    exit_if(close(fd) == -1, "Close main \n");
     end_of_connection();
     printf("Server closed !\n");
     return EXIT_SUCCESS;
 }
 
-void intHandler(int dummy) {
-    //signal(dummy, SIG_IGN);
+void intHandler(int dummy) { //n'est plus utilisé
     end_of_connection();
     exit(0);
 }
