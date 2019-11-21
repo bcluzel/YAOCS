@@ -60,6 +60,7 @@ int read_header_nb(int fd, struct message *answer){
     {
         if (errno == EAGAIN)
         {
+            usleep(500);
             return header_readed;
         }else
         {
@@ -130,6 +131,7 @@ int read_stdin(char *buffer){
     {
         if (errno == EAGAIN)
         {
+            usleep(500);
             return header_readed;
         }else
         {
