@@ -8,7 +8,7 @@
 #include <errno.h>
 #include <string.h>
 #include <signal.h>
-
+#include <time.h>
 
 #include "main.h"
 #include "utils.h"
@@ -211,7 +211,16 @@ void broadcast_str_excluding(struct user_bank *users, char * message, int exclud
         if (users->users[i].id != excluded_id)
         {
             printf("Broadcast to user %d\n",i);
-            send_message_str(users->users[i].fd,message,0);
+            char buffer[50];
+
+            time_t rawtime;
+            struct tm * timeinfo;
+
+            time ( &rawtime );
+            timeinfo = localtime ( &rawtime );
+
+            sprintf(buffer, "[%d:%d:%d] >> %s -> %s", timeinfo->tm_hour, timeinfo->tm_min, timeinfo->tm_sec, users->users[search_user(users, excluded_id)].name, message);
+            send_message_str(users->users[i].fd,buffer,0);
         }
     }
 }
