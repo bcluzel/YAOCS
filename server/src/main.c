@@ -13,7 +13,7 @@
 #include "main.h"
 #include "utils.h"
 
-
+int running;
 int main(int argc, char *argv[])
 {
     signal(SIGINT, intHandler);
@@ -23,7 +23,7 @@ int main(int argc, char *argv[])
     connected_users.num_of_users = 0;
     connected_users.users = NULL;
 
-    int running = 1;
+    running = 1;
 
     if (mkfifo(SERV_PIPE_NAME, 0666) == -1)
     {
@@ -281,5 +281,5 @@ void process_help(struct user_bank *connected_users, struct message message){
 }
 
 void process_stopserver(){
-    end_of_connection();
+    running = 0;
 }
