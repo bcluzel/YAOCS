@@ -37,14 +37,14 @@ int main(int argc, char *argv[])
     }
     client = init_connection(fd);
     char buffer_out[MAX_MESSAGE_LEN+1];
-    printf("  Connected to the server ! \n");
+    printf("  Connecté au serveur ! \n  Pour plus d'aide : /help \n\n");
+
     struct message message;
     switch(fork()) {
         case -1: exit_if(1, "Can't fork");
         case 0: //Son
             while (running)
                 {
-                    usleep(500);
                     if(read_stdin(buffer_out)){
                         if (!strcmp(buffer_out,"/exit\n"))
                         {
