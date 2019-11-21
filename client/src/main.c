@@ -33,10 +33,14 @@ int main(int argc, char *argv[])
     if (fd < 0){
 
         if (fork() == 0) {
-            exit_if(system("../server/bin/server") < 0, "Impossible de demmarer le serveur en arriere plan");
-            dup2("/dev/null", STDIN_FILENO);
-            dup2("/dev/null", STDOUT_FILENO);
-            dup2("/dev/null", STDERR_FILENO);
+            int fd_null = open("/dev/null", O_RDONLY);
+            exit_if(fd_null == -1," open fd_null");
+            int fd_log = open(SERV_LOG_NAME, O_CREAT | O_APPEND | O_WRONLY, 0777);
+            exit_if(fd_log == -1," open fd_log");
+            dup2(fd_null, STDIN_FILENO);
+            dup2(fd_log, STDOUT_FILENO);
+            dup2(fd_log, STDERR_FILENO);
+            exit_if(execl("./server/bin/server","server", (char*)NULL) !=0, "Impossible de demmarer le serveur en arriere plan");
         } 
 
         printf("Serveur en cours de demmarage.\n");
@@ -59,7 +63,6 @@ int main(int argc, char *argv[])
                         if (!strcmp(buffer_out,"/exit\n"))
                         {
                             printf("Exiting !\n");
-                            printf(buffer_out);
                             kill(getppid(),SIGUSR1);
                             running = 0;
                         }else
