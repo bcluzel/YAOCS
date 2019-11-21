@@ -15,7 +15,6 @@
 int running;
 int main(int argc, char *argv[])
 {
-    /*
     switch(fork()) { //daemon
         case -1: exit_if(1, "Can't fork");
         case 0: //Son
@@ -26,7 +25,6 @@ int main(int argc, char *argv[])
             exit(EXIT_FAILURE);
             break;
     };
-    */
     signal(SIGINT, intHandler);
 
     printf("Server launched ! \n");
