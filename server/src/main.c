@@ -90,8 +90,9 @@ int main(int argc, char *argv[])
             }
         }
     }
-    end_of_connection();
     close(fd);
+    end_of_connection();
+    printf("Server closed !\n");
     return EXIT_SUCCESS;
 }
 
@@ -172,6 +173,7 @@ int delete_user(struct user_bank *connected_users, unsigned int user_id){
         connected_users->users = next_users;
         if (connected_users->num_of_users == 0)
         {
+            printf("STOPPPING\n");
             stopserver();
         }
         return 0;

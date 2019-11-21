@@ -3,3 +3,5 @@ server/bin/*
 client/bin/*
 ~.gitkeep
 .vscode
+YAOCS_server
+YAOCS_client
