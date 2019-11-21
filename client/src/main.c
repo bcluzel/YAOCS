@@ -30,11 +30,21 @@ int main(int argc, char *argv[])
 
     server_fd = fd;
 
-    if (fd == -1){
-        perror("Pas de serv ");
-        exit(EXIT_FAILURE);
-        //exec delay retry
+    if (fd < 0){
+
+        if (fork() == 0) {
+            exit_if(system("../server/bin/server") < 0, "Impossible de demmarer le serveur en arriere plan");
+            dup2("/dev/null", STDIN_FILENO);
+            dup2("/dev/null", STDOUT_FILENO);
+            dup2("/dev/null", STDERR_FILENO);
+        } 
+
+        printf("Serveur en cours de demmarage.\n");
+        fd = open(SERV_PIPE_NAME, O_WRONLY | O_NONBLOCK);
+
+        exit_if(fd < 0, "Impossible de lancer le serveur");
     }
+
     client = init_connection(fd);
     char buffer_out[MAX_MESSAGE_LEN+1];
     printf("  Connected to the server ! \n");
