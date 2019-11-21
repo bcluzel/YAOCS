@@ -1,4 +1,4 @@
-TARGET 		= client
+TARGET 		= YAOCS_client
 
 CC 		= gcc
 LINKER 	= gcc -o

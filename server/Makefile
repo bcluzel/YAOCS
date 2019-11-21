@@ -1,4 +1,4 @@
-TARGET 		= server
+TARGET 		= YAOCS_server
 
 CC 		= gcc
 LINKER 	= gcc -o
