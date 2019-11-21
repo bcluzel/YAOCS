@@ -23,8 +23,8 @@ struct user {
 };
 
 struct message {
-    int user_id;
-    int data_len;
+    unsigned int user_id;
+    unsigned int data_len;
     char *data;
 };
 
