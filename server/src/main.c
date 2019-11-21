@@ -7,6 +7,7 @@
 #include <sys/stat.h>
 #include <errno.h>
 #include <string.h>
+#include <signal.h>
 
 
 #include "main.h"
@@ -15,6 +16,8 @@
 
 int main(int argc, char *argv[])
 {
+    signal(SIGINT, intHandler);
+
     printf("Server launched ! \n");
     struct user_bank connected_users;
     connected_users.num_of_users = 0;
@@ -36,7 +39,6 @@ int main(int argc, char *argv[])
     struct message message;
     while (running)
     {
-        usleep(500);
         if(read_header_nb(fd,&message)){
             printf("Message recived id:%u len:%u \n",message.user_id,message.data_len);
             if (!message.data_len)
@@ -56,7 +58,23 @@ int main(int argc, char *argv[])
                         }
                     }else if (message.data[0] == CMD_USER){
                         printf("UserCmd %s",message.data +1);
+
                         // TODO /help /users /msg /changename
+                        if (strstr(message.data,"/users") != NULL)
+                        {
+                            process_list_users(&connected_users, message);
+                        }else if (strstr(message.data,"/changename") != NULL)
+                        {
+                            process_change_name(&connected_users, message);
+                        }else if (strstr(message.data,"/help") != NULL)
+                        {
+                            process_help(&connected_users, message);
+                        }else if (strstr(message.data,"/msg") != NULL)
+                        {
+                            process_msg(&connected_users, message);
+                        }
+
+                        
                     }else
                     {
                         printf("Message data : %s",message.data);
@@ -72,10 +90,20 @@ int main(int argc, char *argv[])
             }
         }
     }
+    end_of_connection();
     close(fd);
     return EXIT_SUCCESS;
 }
 
+void intHandler(int dummy) {
+    //signal(dummy, SIG_IGN);
+    end_of_connection();
+    exit(0);
+}
+
+void end_of_connection(){
+    exit_if(remove(SERV_PIPE_NAME)==-1,"remove end of connection");
+}
 
 void process_hello(struct user_bank * connected_users, unsigned int user_id){
     printf("Process hello \n");
@@ -149,7 +177,7 @@ int delete_user(struct user_bank *connected_users, unsigned int user_id){
 
 int change_user_name(struct user_bank *connected_users, unsigned int user_id, char * username){
     int index_user;
-    if((index_user = search_user(connected_users,user_id)) != 0){
+    if((index_user = search_user(connected_users,user_id)) != -1){
         strcpy(connected_users->users[index_user].name,username);
         return 0;
     }
@@ -182,4 +210,68 @@ void broadcast_str_excluding(struct user_bank *users, char * message, int exclud
             send_message_str(users->users[i].fd,message,0);
         }
     }
+}
+
+
+void process_list_users(struct user_bank *connected_users, struct message message){
+    char buff[MAX_USER_NAME_LEN + 10];
+    int client_fd = connected_users->users[search_user(connected_users,message.user_id)].fd;
+    send_message_str(client_fd,"UTILISATEURS:\n",ID_SERVER);
+    for (int i = 0; i < connected_users->num_of_users; i++)
+    {
+        strcpy(buff,"> ");
+        strcat(buff, connected_users->users[i].name);
+        strcat(buff, "\n");
+        send_message_str(client_fd,buff,ID_SERVER);
+    }
+    
+}
+void process_change_name(struct user_bank *connected_users, struct message message){
+    int name_len;
+    int index_user = search_user(connected_users,message.user_id);
+    int client_fd = connected_users->users[index_user].fd;
+    char *name = strchr(message.data,' ');
+    if (name == NULL)
+    {
+        send_message_str(client_fd,"Pas d'argument !\n",ID_SERVER);
+        return;
+    }else
+    {
+        name = name + 1; // on enléve le ' '
+    }
+    char *end = strchr(name,'\n');
+    if (end != NULL)
+    {
+        end[0] = '\0';
+    }else
+    {
+        send_message_str(client_fd,"Pas d'argument !\n",ID_SERVER);
+        return;
+    }
+    
+    printf("Name : %s\n", name);
+    name_len = strlen(name);
+    if (name_len > MAX_USER_NAME_LEN)
+    {
+        send_message_str(client_fd,"Nom trop long !\n",ID_SERVER);
+    }else if (name_len<2){
+        send_message_str(client_fd,"Nom trop court !\n",ID_SERVER);
+    }else{
+        change_user_name(connected_users,message.user_id,name);
+        send_message_str(client_fd,"Nom changé!\n",ID_SERVER);
+    }
+    
+}
+void process_msg(struct user_bank *connected_users, struct message message){
+    //int index_user = search_user(connected_users,message.user_id);
+    //int client_fd = connected_users->users[index_user].fd;
+}
+void process_help(struct user_bank *connected_users, struct message message){
+    int index_user = search_user(connected_users,message.user_id);
+    int client_fd = connected_users->users[index_user].fd;
+    send_message_str(client_fd,"Liste les commandes :\n",ID_SERVER);
+    send_message_str(client_fd,"> /changename <nom>\n",ID_SERVER);
+    send_message_str(client_fd,"> /users - liste les utilisateurs connectés\n",ID_SERVER);
+    send_message_str(client_fd,"> /msg <nom client> <message> - envoi un message privé\n",ID_SERVER);
+
 }
