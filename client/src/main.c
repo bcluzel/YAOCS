@@ -40,13 +40,23 @@ int main(int argc, char *argv[])
             dup2(fd_null, STDIN_FILENO);
             dup2(fd_log, STDOUT_FILENO);
             dup2(fd_log, STDERR_FILENO);
-            exit_if(execl("./server/bin/server","server", (char*)NULL) !=0, "Impossible de demmarer le serveur en arriere plan");
+            exit_if(execl("./YAOCS_server","YAOCS_server", (char*)NULL) !=0, "Impossible de demmarer le serveur en arriere plan");
         } 
 
-        printf("Serveur en cours de demmarage.\n");
-        fd = open(SERV_PIPE_NAME, O_WRONLY | O_NONBLOCK);
-
-        exit_if(fd < 0, "Impossible de lancer le serveur");
+        printf("Serveur en cours de démarage.\n");
+        
+        while ((fd = open(SERV_PIPE_NAME, O_WRONLY | O_NONBLOCK)) == -1)
+        {
+                if (errno == ENOENT)
+                {
+                    // waiting the server
+                }else
+                {
+                    exit_if(fd < 0, "Impossible de lancer le serveur");
+                }
+                usleep(10);
+        }
+        
     }
 
     client = init_connection(fd);
