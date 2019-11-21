@@ -28,7 +28,6 @@ int main(int argc, char *argv[])
     running = 1;
     int fd = open(SERV_PIPE_NAME,O_WRONLY | O_NONBLOCK);
 
-    server_fd = fd;
 
     if (fd < 0){
 
@@ -58,7 +57,7 @@ int main(int argc, char *argv[])
         }
         
     }
-
+    server_fd = fd;
     client = init_connection(fd);
     char buffer_out[MAX_MESSAGE_LEN+1];
     printf("  Connecté au serveur ! \n  Pour plus d'aide : /help \n\n");
@@ -98,7 +97,6 @@ int main(int argc, char *argv[])
                 }
             }
             end_of_connection();
-            close(fd);
             int wstatus;
             wait(&wstatus);
             break;
@@ -170,10 +168,9 @@ void end_of_connection(){
     char buffer[2];
     buffer[0] = CMD_SERVER;
     buffer[1] = END_OF_CONNECTION;
-    printf("EXIT TO SERV \n");
     if (client.connected){
         send_message_server(server_fd, buffer, client.id, 2);
-        close(client.fd);
+        exit_if(close(client.fd)==-1,"close end of connection");
         path_mkfifo_client(client.id,buffer_path);
         exit_if(remove(buffer_path)==-1,"remove end of connection");
         client.connected = 0;
