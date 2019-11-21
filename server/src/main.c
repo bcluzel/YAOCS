@@ -72,7 +72,11 @@ int main(int argc, char *argv[])
                         }else if (strstr(message.data,"/msg") != NULL)
                         {
                             process_msg(&connected_users, message);
+                        }else if (strstr(message.data,"/stopserver") != NULL)
+                        {
+                            process_stopserver();
                         }
+
 
                         
                     }else
@@ -273,5 +277,9 @@ void process_help(struct user_bank *connected_users, struct message message){
     send_message_str(client_fd,"> /changename <nom>\n",ID_SERVER);
     send_message_str(client_fd,"> /users - liste les utilisateurs connectés\n",ID_SERVER);
     send_message_str(client_fd,"> /msg <nom client> <message> - envoi un message privé\n",ID_SERVER);
+    send_message_str(client_fd,"> /stopserver - termine le server\n",ID_SERVER);
+}
 
+void process_stopserver(){
+    end_of_connection();
 }
