@@ -168,6 +168,7 @@ void end_of_connection(){
     char buffer[2];
     buffer[0] = CMD_SERVER;
     buffer[1] = END_OF_CONNECTION;
+    printf("EXIT TO SERV \n");
     if (client.connected){
         send_message_server(server_fd, buffer, client.id, 2);
         exit_if(close(client.fd)==-1,"close end of connection");
