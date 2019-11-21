@@ -47,7 +47,7 @@ int main(int argc, char *argv[])
         
         while ((fd = open(SERV_PIPE_NAME, O_WRONLY | O_NONBLOCK)) == -1)
         {
-                if (errno == ENOENT)
+                if (errno == ENOENT || errno == ENXIO)
                 {
                     // waiting the server
                 }else
@@ -170,6 +170,7 @@ void end_of_connection(){
     char buffer[2];
     buffer[0] = CMD_SERVER;
     buffer[1] = END_OF_CONNECTION;
+    printf("EXIT TO SERV \n");
     if (client.connected){
         send_message_server(server_fd, buffer, client.id, 2);
         close(client.fd);
