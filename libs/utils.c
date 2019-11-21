@@ -100,14 +100,14 @@ void recive_message(int fd, char * data, int data_len){
 void send_message_str(int server_fd, char *message, unsigned int id_client){
     char buffer[8];
     create_header(buffer, strlen(message)+1, id_client);
-    exit_if(write(server_fd,buffer,8) == -1,"hello message write");
+    exit_if(write(server_fd,buffer,8) == -1,"Send str message write");
     exit_if(write(server_fd,message,strlen(message)+1) == -1,"send serv message write");
 }
 
 void send_message(int server_fd, char *message, unsigned int id_client, int message_len){
     char buffer[8];
     create_header(buffer, message_len, id_client);
-    exit_if(write(server_fd,buffer,8) == -1,"hello message write");
+    exit_if(write(server_fd,buffer,8) == -1,"Send message write");
     exit_if(write(server_fd,message,message_len) == -1,"send serv message write");
 }
 
