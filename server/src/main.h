@@ -20,4 +20,4 @@ void process_list_users(struct user_bank *connected_users, struct message messag
 void process_change_name(struct user_bank *connected_users, struct message message);
 void process_msg(struct user_bank *connected_users, struct message message);
 void process_help(struct user_bank *connected_users, struct message message);
-void process_stopserver();
+void stopserver();

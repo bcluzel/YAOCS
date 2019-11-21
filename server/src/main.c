@@ -72,9 +72,6 @@ int main(int argc, char *argv[])
                         }else if (strstr(message.data,"/msg") != NULL)
                         {
                             process_msg(&connected_users, message);
-                        }else if (strstr(message.data,"/stopserver") != NULL)
-                        {
-                            process_stopserver();
                         }
 
 
@@ -174,6 +171,10 @@ int delete_user(struct user_bank *connected_users, unsigned int user_id){
         free(connected_users->users);
         printf("User deconnected: %u \n",connected_users->num_of_users);
         connected_users->users = next_users;
+        if (connected_users->num_of_users == 0)
+        {
+            stopserver();
+        }
         return 0;
     }
     return -1;
@@ -277,10 +278,9 @@ void process_help(struct user_bank *connected_users, struct message message){
     send_message_str(client_fd,"> /changename <nom>\n",ID_SERVER);
     send_message_str(client_fd,"> /users - liste les utilisateurs connectés\n",ID_SERVER);
     send_message_str(client_fd,"> /msg <nom client> <message> - envoi un message privé\n",ID_SERVER);
-    send_message_str(client_fd,"> /stopserver - termine le server\n",ID_SERVER);
     send_message_str(client_fd,"> /exit\n",ID_SERVER);
 }
 
-void process_stopserver(){
+void stopserver(){
     running = 0;
 }
