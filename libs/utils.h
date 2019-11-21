@@ -4,6 +4,7 @@
 #define ID_SERVER 0
 
 #define SERV_PIPE_NAME "/tmp/chat"
+#define SERV_LOG_NAME  "/tmp/server_log"
 #define PIPE_DEFAULT_FOLDER "/tmp/"
 #define LOCK_DEFAULT_FILE "/tmp/lock"
 #define PIPE_FOLDER_PLUS_INTREP_LEN 18
