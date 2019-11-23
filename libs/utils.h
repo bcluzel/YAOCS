@@ -19,7 +19,7 @@
 #define FILE_DESCRIPTOR_RECIVED 0xA0
 
 /**
- * Permet de stocker toutes les information concrenant un utilisateur connecté au server
+ * @brief Permet de stocker toutes les information concrenant un utilisateur connecté au server
  */
 struct user {
     unsigned int id; /** Id de l'utilisateur */
@@ -27,7 +27,7 @@ struct user {
     int fd; /** File descriptor ouvert du pipe utilisateur */
 };
 /**
- * Permet de stocker le header ainsi que le message recu correspondant au header
+ * @brief Permet de stocker le header ainsi que le message recu correspondant au header
  */
 struct message {
     unsigned int user_id; /** Id de l'utilidateur envoyant le message*/

@@ -143,7 +143,7 @@ int search_user(struct user_bank *connected_users, unsigned int user_id){
     return -1;
 }
 
-int add_user(struct user_bank *connected_users, unsigned int user_id){
+void add_user(struct user_bank *connected_users, unsigned int user_id){
     struct user new_user;
     new_user.id = user_id;
     new_user.fd = open_client_connection(user_id);
@@ -159,8 +159,6 @@ int add_user(struct user_bank *connected_users, unsigned int user_id){
     printf("User connected: %u \n",connected_users->num_of_users);
     connected_users->users = next_users;
     connected_users->users[connected_users->num_of_users-1] = new_user;
-
-    return 0;
 }
 
 int delete_user(struct user_bank *connected_users, unsigned int user_id){

@@ -7,6 +7,6 @@ make
 cd ..
 rm YAOCS_client
 rm YAOCS_server
-cp ./client/bin/YAOCS_client YAOCS_client
-cp ./server/bin/YAOCS_server YAOCS_server
+mv ./client/bin/YAOCS_client YAOCS_client
+mv ./server/bin/YAOCS_server YAOCS_server
 

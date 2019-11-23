@@ -5,3 +5,4 @@ client/bin/*
 .vscode
 YAOCS_server
 YAOCS_client
+report/html
