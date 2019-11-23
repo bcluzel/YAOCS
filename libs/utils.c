@@ -1,7 +1,11 @@
+/** 
+ * @file 
+ * @brief Fonctions partagées entre le client et le server YAOCS
+ * */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
 #include <unistd.h>
 #include <fcntl.h>
 #include <sys/types.h>
