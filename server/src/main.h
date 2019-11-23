@@ -97,7 +97,7 @@ void process_list_users(struct user_bank *connected_users, struct message messag
  */
 void process_change_name(struct user_bank *connected_users, struct message message);
 /**
- * @brief [NON IMPLÉMENTÉ] Traite la comande client /msg <X> <msg>: envoi un message(msg) privé à un utilisateur X
+ * @brief [NON IMPLÉMENTÉ] Traite la comande client /msg `X` `msg`: envoi un message(`msg`) privé à un utilisateur `X`
  * 
  * @param connected_users 
  * @param message 
