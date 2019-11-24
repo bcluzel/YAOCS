@@ -1,5 +1,5 @@
 /**
- * @brief Structure sert à rassembler les information utiles d'un client.
+ * @brief Rassemble les information utiles d'un client.
  * 
  * Cette structure permet d'augementer la lisibilitée du code
  * 
